@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f6feb">
+<title>Kaam Delegate</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1b2333;--mut:#6b7686;--pri:#1f6feb;--ok:#1a9d5b;--warn:#e08a00;--bad:#d64545;--line:#e3e8f0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-top:env(safe-area-inset-top)}
+.hide{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 4px}
+p.sub{color:var(--mut);margin:0 0 16px;font-size:14px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px}
+textarea{min-height:70px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer}
+.btn{background:var(--pri);color:#fff;width:100%}
+.btn.alt{background:#e8eefc;color:var(--pri)}
+.link{background:none;color:var(--pri);width:100%;padding:8px}
+.box{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(20,30,60,.06)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
+header{background:var(--pri);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+header b{font-size:17px}
+header small{display:block;opacity:.85;font-size:12px}
+header button{background:rgba(255,255,255,.18);color:#fff;padding:8px 12px;font-size:13px}
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:4}
+.tabs button{flex:1;background:none;border-radius:0;padding:13px 4px;color:var(--mut);font-size:14px;border-bottom:3px solid transparent}
+.tabs button.on{color:var(--pri);border-bottom-color:var(--pri)}
+.task{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,30,60,.06);border-left:5px solid var(--line)}
+.task.p-high{border-left-color:var(--bad)}.task.p-med{border-left-color:var(--warn)}.task.p-low{border-left-color:var(--ok)}
+.task.done{opacity:.65}
+.task h3{margin:0 0 4px;font-size:16px}
+.task .d{color:var(--mut);font-size:13px;margin:0 0 8px;white-space:pre-wrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;margin-bottom:10px}
+.chip{background:#eef2f8;border-radius:20px;padding:4px 10px;color:#3b4660}
+.chip.late{background:#fde8e8;color:var(--bad)}
+.note{background:#fffbe6;border-radius:8px;padding:8px;font-size:13px;margin-bottom:10px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.acts button{padding:8px 10px;font-size:13px;background:#eef2f8;color:#3b4660}
+.acts button.cur{background:var(--pri);color:#fff}
+.acts button.del{background:#fde8e8;color:var(--bad);margin-left:auto}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:auto;border-radius:30px;padding:15px 22px;box-shadow:0 4px 14px rgba(31,111,235,.45);z-index:6}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
+.sheet{background:#fff;width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px;max-width:560px;margin:0 auto}
+label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.code{font-size:26px;letter-spacing:4px;font-weight:800;color:var(--pri);text-align:center}
+.stat{display:flex;gap:8px;margin-bottom:12px}
+.stat div{flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--mut)}
+.stat b{display:block;font-size:20px;color:var(--ink)}
+.spin{text-align:center;padding:60px;color:var(--mut)}
+</style>
+</head>
+<body>
+
+<div id="loading" class="spin">Load ho raha hai...</div>
+
+<!-- LOGIN -->
+<div id="auth" class="wrap hide">
+  <h1>📋 Kaam Delegate</h1>
+  <p class="sub">Team ko kaam do, status dekho — sab kuch live.</p>
+  <div class="box">
+    <input id="a-name" placeholder="Aapka naam" class="hide">
+    <input id="a-email" type="email" placeholder="Email" autocomplete="email">
+    <input id="a-pass" type="password" placeholder="Password (kam se kam 6 akshar)" autocomplete="current-password">
+    <div id="a-err" class="err"></div>
+    <button id="a-go" class="btn">Login</button>
+    <button id="a-toggle" class="link">Naya account banao</button>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="team" class="wrap hide">
+  <h1>Apni Team chuno</h1>
+  <p class="sub">Nayi team banao ya dost/staff ka code daalo.</p>
+  <div class="box">
+    <b>Nayi team banao</b><br><br>
+    <input id="t-name" placeholder="Team ka naam (jaise: Dukaan Staff)">
+    <button id="t-create" class="btn">Team Banao</button>
+  </div>
+  <div class="box">
+    <b>Code se judo</b><br><br>
+    <input id="t-code" placeholder="6 akshar ka team code" maxlength="6" style="text-transform:uppercase">
+    <button id="t-join" class="btn alt">Judo</button>
+  </div>
+  <div id="t-err" class="err"></div>
+  <button id="t-logout" class="link">Logout</button>
+</div>
+
+<!-- MAIN -->
+<div id="main" class="hide">
+  <header>
+    <div><b id="m-team">Team</b><small id="m-user"></small></div>
+    <div><button id="m-info">Team Code</button> <button id="m-logout">Logout</button></div>
+  </header>
+  <div class="tabs">
+    <button data-t="mine" class="on">Mere Kaam</button>
+    <button data-t="given">Maine Diye</button>
+    <button data-t="all">Poori Team</button>
+  </div>
+  <div class="wrap">
+    <div class="stat" id="stat"></div>
+    <div id="list"></div>
+  </div>
+  <button id="fab" class="btn fab">+ Naya Kaam</button>
+</div>
+
+<!-- NEW TASK -->
+<div id="modal" class="modal hide">
+  <div class="sheet">
+    <h1 style="margin-top:0">Naya Kaam Do</h1>
+    <label>Kaam kya hai?</label>
+    <input id="n-title" placeholder="Jaise: Maal ka hisaab banao">
+    <label>Details (optional)</label>
+    <textarea id="n-desc"></textarea>
+    <label>Kisko dena hai?</label>
+    <select id="n-to"></select>
+    <div class="row">
+      <div><label>Last date</label><input id="n-due" type="date"></div>
+      <div><label>Zaroorat</label>
+        <select id="n-pri"><option value="high">🔴 Zaroori</option><option value="med" selected>🟠 Normal</option><option value="low">🟢 Aaram se</option></select></div>
+    </div>
+    <div id="n-err" class="err"></div>
+    <button id="n-save" class="btn">Kaam Bhejo</button>
+    <button id="n-cancel" class="link">Cancel</button>
+  </div>
+</div>
+
+<!-- TEAM INFO -->
+<div id="info" class="modal hide">
+  <div class="sheet">
+    <h1 style="margin-top:0">Team Code</h1>
+    <p class="sub">Ye code staff ko do, wo app me "Code se judo" me daalenge.</p>
+    <div class="code" id="i-code"></div>
+    <p class="sub" style="margin-top:14px">Members:</p>
+    <div id="i-members"></div>
+    <button id="i-close" class="btn alt" style="margin-top:12px">Band karo</button>
+  </div>
+</div>
+
+<script src="firebase-config.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,updateProfile} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,where,onSnapshot,arrayUnion,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const show=id=>{["loading","auth","team","main"].forEach(x=>$(x).classList.toggle("hide",x!==id))};
+
+if(!window.FIREBASE_CONFIG||FIREBASE_CONFIG.apiKey==="YAHAN_APIKEY"){
+  $("loading").innerHTML="⚠️ Firebase config nahi daala.<br>www/firebase-config.js me apna config paste karo (README dekho).";
+  throw new Error("no config");
+}
+const app=initializeApp(FIREBASE_CONFIG);
+const auth=getAuth(app), db=getFirestore(app);
+
+let me=null, teamId=null, team=null, tab="mine", tasks=[], unsubTasks=null, unsubTeam=null, signup=false;
+
+const errMsg=e=>{const c=e.code||"";
+  if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found"))return"Email ya password galat hai.";
+  if(c.includes("email-already"))return"Ye email pehle se registered hai.";
+  if(c.includes("weak-password"))return"Password kam se kam 6 akshar ka rakho.";
+  if(c.includes("invalid-email"))return"Email sahi nahi hai.";
+  if(c.includes("network"))return"Internet check karo.";
+  if(c.includes("permission"))return"Permission nahi mili (Firestore rules check karo).";
+  return e.message||"Kuch gadbad hui.";};
+
+// ---------- AUTH ----------
+$("a-toggle").onclick=()=>{signup=!signup;
+  $("a-name").classList.toggle("hide",!signup);
+  $("a-go").textContent=signup?"Account Banao":"Login";
+  $("a-toggle").textContent=signup?"Pehle se account hai? Login karo":"Naya account banao";
+  $("a-err").textContent="";};
+$("a-go").onclick=async()=>{
+  const email=$("a-email").value.trim(), pass=$("a-pass").value, name=$("a-name").value.trim();
+  $("a-err").textContent="";
+  try{
+    if(signup){
+      if(!name){$("a-err").textContent="Naam daalo.";return;}
+      const c=await createUserWithEmailAndPassword(auth,email,pass);
+      await updateProfile(c.user,{displayName:name});
+      await setDoc(doc(db,"users",c.user.uid),{name,email,teamId:null});
+    }else await signInWithEmailAndPassword(auth,email,pass);
+  }catch(e){$("a-err").textContent=errMsg(e);}
+};
+$("m-logout").onclick=$("t-logout").onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async u=>{
+  cleanup();
+  if(!u){me=null;show("auth");return;}
+  me={uid:u.uid,name:u.displayName||u.email};
+  try{
+    // thoda ruko: signup ke time user doc bann raha hota hai
+    let s=await getDoc(doc(db,"users",u.uid));
+    if(!s.exists()){await setDoc(doc(db,"users",u.uid),{name:me.name,email:u.email,teamId:null});s=await getDoc(doc(db,"users",u.uid));}
+    teamId=s.data().teamId||null;
+    teamId?openTeam():show("team");
+  }catch(e){show("team");$("t-err").textContent=errMsg(e);}
+});
+
+function cleanup(){unsubTasks&&unsubTasks();unsubTeam&&unsubTeam();unsubTasks=unsubTeam=null;tasks=[];team=null;}
+
+// ---------- TEAM ----------
+const genCode=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;};
+$("t-create").onclick=async()=>{
+  const name=$("t-name").value.trim(); $("t-err").textContent="";
+  if(!name){$("t-err").textContent="Team ka naam daalo.";return;}
+  try{
+    const code=genCode();
+    await setDoc(doc(db,"teams",code),{name,owner:me.uid,memberUids:[me.uid],members:[{uid:me.uid,name:me.name}],createdAt:serverTimestamp()});
+    await updateDoc(doc(db,"users",me.uid),{teamId:code});
+    teamId=code;openTeam();
+  }catch(e){$("t-err").textContent=errMsg(e);}
+};
+$("t-join").onclick=async()=>{
+  const code=$("t-code").value.trim().toUpperCase(); $("t-err").textContent="";
+  if(code.length!==6){$("t-err").textContent="6 akshar ka code daalo.";return;}
+  try{
+    const r=doc(db,"teams",code), s=await getDoc(r);
+    if(!s.exists()){$("t-err").textContent="Ye code galat hai.";return;}
+    const d=s.data();
+    if(!d.memberUids.includes(me.uid))
+      await updateDoc(r,{memberUids:arrayUnion(me.uid),members:arrayUnion({uid:me.uid,name:me.name})});
+    await updateDoc(doc(db,"users",me.uid),{teamId:code});
+    teamId=code;openTeam();
+  }catch(e){$("t-err").textContent=errMsg(e);}
+};
+
+function openTeam(){
+  show("main");
+  $("m-user").textContent=me.name;
+  unsubTeam=onSnapshot(doc(db,"teams",teamId),s=>{
+    if(!s.exists())return; team=s.data();
+    $("m-team").textContent=team.name; fillMembers(); renderInfo();
+  });
+  unsubTasks=onSnapshot(query(collection(db,"tasks"),where("teamId","==",teamId)),s=>{
+    tasks=s.docs.map(d=>({id:d.id,...d.data()}));
+    tasks.sort((a,b)=>(a.status==="done")-(b.status==="done")||(a.due||"9999").localeCompare(b.due||"9999"));
+    render();
+  },e=>{$("list").innerHTML=`<div class="empty">${esc(errMsg(e))}</div>`;});
+}
+
+function fillMembers(){
+  $("n-to").innerHTML=team.members.map(m=>`<option value="${esc(m.uid)}">${esc(m.name)}${m.uid===me.uid?" (khud)":""}</option>`).join("");
+}
+function renderInfo(){
+  $("i-code").textContent=teamId;
+  $("i-members").innerHTML=team.members.map(m=>`<div class="chip" style="display:inline-block;margin:3px">${esc(m.name)}</div>`).join("");
+}
+$("m-info").onclick=()=>$("info").classList.remove("hide");
+$("i-close").onclick=()=>$("info").classList.add("hide");
+
+// ---------- TASKS ----------
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  tab=b.dataset.t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));render();});
+
+const SL={todo:"Baki",doing:"Chal raha",done:"Ho gaya"};
+const today=()=>new Date().toISOString().slice(0,10);
+
+function render(){
+  const mine=tasks.filter(t=>t.assignedTo===me.uid), given=tasks.filter(t=>t.assignedBy===me.uid);
+  const set=tab==="mine"?mine:tab==="given"?given:tasks;
+  const cnt=k=>set.filter(t=>t.status===k).length;
+  $("stat").innerHTML=["todo","doing","done"].map(k=>`<div><b>${cnt(k)}</b>${SL[k]}</div>`).join("");
+  if(!set.length){$("list").innerHTML=`<div class="empty">${tab==="mine"?"Aapko abhi koi kaam nahi mila 🎉":tab==="given"?"Aapne abhi koi kaam nahi diya.":"Team me abhi koi kaam nahi."}</div>`;return;}
+  $("list").innerHTML=set.map(t=>{
+    const late=t.due&&t.due<today()&&t.status!=="done";
+    const canMove=t.assignedTo===me.uid||t.assignedBy===me.uid;
+    return `<div class="task p-${esc(t.priority)} ${t.status==="done"?"done":""}">
+      <h3>${esc(t.title)}</h3>
+      ${t.desc?`<p class="d">${esc(t.desc)}</p>`:""}
+      <div class="meta">
+        <span class="chip">👤 ${esc(t.assignedToName)}</span>
+        <span class="chip">📤 ${esc(t.assignedByName)}</span>
+        ${t.due?`<span class="chip ${late?"late":""}">📅 ${esc(t.due)}${late?" (late)":""}</span>`:""}
+      </div>
+      ${t.note?`<div class="note">📝 ${esc(t.note)}</div>`:""}
+      <div class="acts">
+        ${canMove?["todo","doing","done"].map(k=>`<button class="${t.status===k?"cur":""}" data-a="st" data-id="${t.id}" data-v="${k}">${SL[k]}</button>`).join(""):""}
+        ${canMove?`<button data-a="note" data-id="${t.id}">📝 Note</button>`:""}
+        ${t.assignedBy===me.uid?`<button class="del" data-a="del" data-id="${t.id}">🗑</button>`:""}
+      </div></div>`;}).join("");
+}
+$("list").onclick=async e=>{
+  const b=e.target.closest("button");if(!b)return;
+  const id=b.dataset.id, r=doc(db,"tasks",id), t=tasks.find(x=>x.id===id);
+  try{
+    if(b.dataset.a==="st")await updateDoc(r,{status:b.dataset.v});
+    if(b.dataset.a==="note"){const n=prompt("Update / note likho:",t.note||"");if(n!==null)await updateDoc(r,{note:n.trim()});}
+    if(b.dataset.a==="del"&&confirm("Ye kaam delete karna hai?"))await deleteDoc(r);
+  }catch(err){alert(errMsg(err));}
+};
+
+$("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
+$("n-cancel").onclick=()=>$("modal").classList.add("hide");
+$("n-save").onclick=async()=>{
+  const title=$("n-title").value.trim(); if(!title){$("n-err").textContent="Kaam ka naam daalo.";return;}
+  const toUid=$("n-to").value, to=team.members.find(m=>m.uid===toUid);
+  try{
+    await addDoc(collection(db,"tasks"),{teamId,title,desc:$("n-desc").value.trim(),assignedTo:toUid,assignedToName:to.name,
+      assignedBy:me.uid,assignedByName:me.name,due:$("n-due").value||"",priority:$("n-pri").value,status:"todo",note:"",createdAt:serverTimestamp()});
+    $("modal").classList.add("hide");
+  }catch(e){$("n-err").textContent=errMsg(e);}
+};
+</script>
+</body>
+</html>

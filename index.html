@@ -64,13 +64,14 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
   <h1>📋 GS TEAM</h1>
   <p class="sub">Assign work to your team and track status, live.</p>
   <div class="box">
-    <input id="a-name" placeholder="Your name" class="hide">
-    <input id="a-phone" type="tel" placeholder="WhatsApp number (e.g. 9876543210)" class="hide">
-    <input id="a-email" type="email" placeholder="Email" autocomplete="email">
-    <input id="a-pass" type="password" placeholder="Password (at least 6 characters)" autocomplete="current-password">
+    <input id="a-name" placeholder="Your name">
+    <input id="a-phone" type="tel" placeholder="WhatsApp number (e.g. 9876543210)">
+    <input id="a-pin" type="password" inputmode="numeric" maxlength="6" placeholder="Secret PIN (4-6 digits)" autocomplete="off">
+    <input id="a-email" type="email" placeholder="Email" autocomplete="email" class="hide">
+    <input id="a-pass" type="password" placeholder="Password (at least 6 characters)" autocomplete="current-password" class="hide">
     <div id="a-err" class="err"></div>
-    <button id="a-go" class="btn">Login</button>
-    <button id="a-toggle" class="link">Create a new account</button>
+    <button id="a-go" class="btn">Continue</button>
+    <button id="a-toggle" class="link">Use email login (old accounts)</button>
   </div>
 </div>
 
@@ -180,28 +181,42 @@ const errMsg=e=>{const c=e.code||"";
   return e.message||"Something went wrong.";};
 
 // ---------- AUTH ----------
-$("a-toggle").onclick=()=>{signup=!signup;
-  $("a-name").classList.toggle("hide",!signup);
-  $("a-phone").classList.toggle("hide",!signup);
-  $("a-go").textContent=signup?"Create Account":"Login";
-  $("a-toggle").textContent=signup?"Already have an account? Log in":"Create a new account";
+let emailMode=false, signingUp=false;
+$("a-toggle").onclick=()=>{emailMode=!emailMode;
+  ["a-name","a-phone","a-pin"].forEach(i=>$(i).classList.toggle("hide",emailMode));
+  ["a-email","a-pass"].forEach(i=>$(i).classList.toggle("hide",!emailMode));
+  $("a-go").textContent=emailMode?"Login":"Continue";
+  $("a-toggle").textContent=emailMode?"Use name + WhatsApp number":"Use email login (old accounts)";
   $("a-err").textContent="";};
 $("a-go").onclick=async()=>{
-  const email=$("a-email").value.trim(), pass=$("a-pass").value, name=$("a-name").value.trim();
   $("a-err").textContent="";
   try{
-    if(signup){
-      if(!name){$("a-err").textContent="Enter your name.";return;}
-      const phone=waNum($("a-phone").value); if(!phone){$("a-err").textContent="Enter a valid WhatsApp number.";return;}
-      const c=await createUserWithEmailAndPassword(auth,email,pass);
-      await updateProfile(c.user,{displayName:name});
-      await setDoc(doc(db,"users",c.user.uid),{name,email,teamId:null,phone});
-    }else await signInWithEmailAndPassword(auth,email,pass);
+    if(emailMode){await signInWithEmailAndPassword(auth,$("a-email").value.trim(),$("a-pass").value);return;}
+    const name=$("a-name").value.trim(), phone=waNum($("a-phone").value), pin=$("a-pin").value.trim();
+    if(!name){$("a-err").textContent="Enter your name.";return;}
+    if(!phone){$("a-err").textContent="Enter a valid WhatsApp number.";return;}
+    if(!/^\d{4,6}$/.test(pin)){$("a-err").textContent="PIN must be 4 to 6 digits.";return;}
+    const email=phone+"@gsteam.app", pass="gs-"+pin+"-"+phone;
+    try{await signInWithEmailAndPassword(auth,email,pass);}
+    catch(e){
+      const c=e.code||"";
+      if(!(c.includes("invalid-credential")||c.includes("user-not-found")||c.includes("wrong-password")))throw e;
+      signingUp=true;
+      try{
+        const cr=await createUserWithEmailAndPassword(auth,email,pass);
+        await updateProfile(cr.user,{displayName:name});
+        await setDoc(doc(db,"users",cr.user.uid),{name,email,teamId:null,phone});
+        signingUp=false; await handleUser(auth.currentUser);
+      }catch(e2){signingUp=false;
+        if((e2.code||"").includes("email-already"))throw new Error("This number is already registered. Check your PIN.");
+        throw e2;}
+    }
   }catch(e){$("a-err").textContent=errMsg(e);}
 };
 $("m-logout").onclick=$("t-logout").onclick=()=>signOut(auth);
 
-onAuthStateChanged(auth,async u=>{
+onAuthStateChanged(auth,u=>{if(!signingUp)handleUser(u);});
+async function handleUser(u){
   cleanup();
   if(!u){me=null;show("auth");return;}
   me={uid:u.uid,name:u.displayName||u.email};
@@ -212,7 +227,7 @@ onAuthStateChanged(auth,async u=>{
     teamId=s.data().teamId||null; me.phone=s.data().phone||"";
     teamId?openTeam():show("team");
   }catch(e){show("team");$("t-err").textContent=errMsg(e);}
-});
+}
 
 function cleanup(){unsubTasks&&unsubTasks();unsubTeam&&unsubTeam();unsubTasks=unsubTeam=null;tasks=[];team=null;}
 
@@ -297,6 +312,26 @@ const RL={boss:"Boss",manager:"SEO Manager",exec:"Executive"};
 const roleOf=uid=>{if(!team)return"exec";const m=team.members.find(x=>x.uid===uid);if(m&&m.role)return m.role;return uid===team.owner?"boss":"exec";};
 const canSeeAll=()=>{if(!team)return false;if(roleOf(me.uid)==="boss")return true;const m=team.members.find(x=>x.uid===me.uid);return !m||m.seeAll!==false;};
 let reports=[];
+const summaryText=arr=>{
+  const by={}; arr.forEach(t=>{(by[t.assignedToName]=by[t.assignedToName]||[]).push(t);});
+  const L=(label,list)=>list.length?"\n"+label+" ("+list.length+"): "+list.map(t=>t.title+(t.due&&t.due<today()&&t.status!=="done"?" [LATE]":"")).join(", "):"";
+  let out="📊 GS TEAM TASK SUMMARY\nDate: "+today()+"\n";
+  Object.keys(by).forEach(n=>{const a=by[n];out+="\n👤 "+n+L("✅ Done",a.filter(x=>x.status==="done"))+L("🔄 In Progress",a.filter(x=>x.status==="doing"))+L("⏳ Pending",a.filter(x=>x.status==="todo"))+"\n";});
+  const c=k=>arr.filter(x=>x.status===k).length;
+  return out+"\nTOTAL: "+arr.length+" assigned · "+c("done")+" done · "+c("doing")+" in progress · "+c("todo")+" pending";};
+let sumDate=null;
+const dailySummary=(date,arr)=>{
+  const day=arr.filter(r=>r.date===date), by={};
+  day.forEach(r=>{(by[r.assignedByName]=by[r.assignedByName]||[]).push(r);});
+  let out="📅 GS TEAM DAILY WORK SUMMARY\nDate: "+date+"\n";
+  const names=Object.keys(by);
+  if(!names.length)return out+"\nNo work reports for this day.";
+  names.forEach(n=>{out+="\n👤 "+n;by[n].forEach(r=>{out+="\n"+(r.status==="completed"?"✅":r.status==="inprogress"?"🔄":"⏳")+" "+r.task+(r.update&&!r.auto?" - "+r.update:"")+(r.staff&&r.staff!==n?" ("+r.staff+")":"");});out+="\n";});
+  const c=k=>day.filter(r=>r.status===k).length;
+  return out+"\nTOTAL: "+day.length+" entries · "+c("completed")+" completed · "+c("inprogress")+" in progress · "+(c("pending")+c("notstarted"))+" pending";};
+const seenKey=()=>"gs_seen_"+me.uid;
+const lastSeen=()=>{try{return Number(localStorage.getItem(seenKey()))||0;}catch(e){return 0;}};
+const newTasks=()=>tasks.filter(t=>t.assignedTo===me.uid&&t.assignedBy!==me.uid&&t.status==="todo"&&((t.createdAt&&t.createdAt.toMillis?t.createdAt.toMillis():0)>lastSeen()));
 const waNum=raw=>{let d=String(raw||"").replace(/\D/g,"").replace(/^0+/,"");if(d.length===10)d="91"+d;return d.length>=11?d:"";};
 const PRL={high:"Urgent",med:"Normal",low:"Low"};
 const taskMsg=(t,rem)=>(rem?"⏰ Reminder: pending task":"📋 New task from GS TEAM")+"\n\nTask: "+t.title+(t.desc?"\nDetails: "+t.desc:"")+"\nAssigned by: "+t.assignedByName+(t.due?"\nDeadline: "+t.due:"")+"\nPriority: "+(PRL[t.priority]||"Normal")+"\n\nPlease update the status in the GS TEAM app.";
@@ -336,6 +371,10 @@ function renderReport(){
     '<button id="r-save" class="btn">'+(ed?"Update":"Save Report")+'</button>'+
     (ed?'<button id="r-cancel" class="link">Edit cancel</button>':'')+'</div>';
   h+='<div class="box"><b>📊 Daily Summary for Today (yours)</b><p class="sub" style="margin:6px 0 0">Assigned: <b>'+st.n+'</b> · Completed: <b>'+st.c+'</b> · In Progress: <b>'+st.p+'</b> · Pending: <b>'+st.pe+'</b></p></div>';
+  const sd=sumDate||td;
+  h+='<div class="box"><b>📅 Daily Work Summary</b><label style="margin-top:8px">Date</label><input id="r-sumdate" type="date" value="'+esc(sd)+'">'+
+    '<p class="d" style="background:#f4f6fb;border-radius:10px;padding:10px;margin:0 0 10px">'+esc(dailySummary(sd,visible))+'</p>'+
+    '<button class="btn alt" data-a="dsum">📤 Share on WhatsApp</button></div>';
   h+='<p class="sub">'+(seeAll?"All team reports":"Your reports")+'</p>';
   if(!visible.length)h+='<div class="empty">No reports yet.</div>';
   h+=visible.map(r=>'<div class="task p-'+(r.status==="completed"?"low":r.status==="pending"?"high":"med")+'"><h3>'+esc(r.task)+'</h3>'+
@@ -349,15 +388,19 @@ function renderReport(){
 
 function render(){
   $("fab").classList.toggle("hide",tab==="report"||roleOf(me.uid)==="exec");
+  const nw=newTasks(), mt=document.querySelector('.tabs [data-t="mine"]');
+  if(mt)mt.textContent=nw.length?"My Tasks ("+nw.length+")":"My Tasks";
   if(tab==="report"){renderReport();return;}
   const mine=tasks.filter(t=>t.assignedTo===me.uid), given=tasks.filter(t=>t.assignedBy===me.uid);
   const set=tab==="mine"?mine:tab==="given"?given:(canSeeAll()?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid));
   const cnt=k=>set.filter(t=>t.status===k).length;
   let sum="";
+  if(tab==="mine"&&nw.length){sum='<div class="note" style="margin-bottom:12px">🔔 <b>'+nw.length+' new task'+(nw.length>1?'s':'')+'</b> from '+esc([...new Set(nw.map(t=>t.assignedByName))].join(", "))+'. <button data-a="seen" style="margin-left:8px;padding:6px 10px">Got it</button></div>';}
   if(tab==="all"&&team&&canSeeAll()){sum='<div class="box"><b>👥 Team Progress</b>'+team.members.map(m=>{
     const t=tasks.filter(x=>x.assignedTo===m.uid), d=t.filter(x=>x.status==="done").length,
       late=t.filter(x=>x.due&&x.due<today()&&x.status!=="done").length;
     return '<div style="display:flex;justify-content:space-between;gap:8px;padding-top:8px;margin-top:8px;border-top:1px solid var(--line)"><span>'+esc(m.name)+' <small style="color:var(--mut)">'+RL[roleOf(m.uid)]+'</small></span><span>'+d+'/'+t.length+' done'+(late?' · <b style="color:var(--bad)">'+late+' late</b>':'')+'</span></div>';}).join("")+'</div>';}
+  if((tab==="all"||tab==="given")&&set.length)sum+='<button class="btn alt" data-a="summary" style="margin-bottom:12px">📤 Share Summary on WhatsApp</button>';
   $("stat").innerHTML=["todo","doing","done"].map(k=>`<div><b>${cnt(k)}</b>${SL[k]}</div>`).join("");
   if(!set.length){$("list").innerHTML=sum+`<div class="empty">${tab==="mine"?"No tasks assigned to you yet 🎉":tab==="given"?"You have not assigned any tasks yet.":"No tasks in the team yet."}</div>`;return;}
   $("list").innerHTML=sum+set.map(t=>{
@@ -368,6 +411,7 @@ function render(){
       ${t.desc?`<p class="d">${esc(t.desc)}</p>`:""}
       <div class="meta">
         <span class="chip">👤 ${esc(t.assignedToName)}</span>
+        ${t.assignedToPhone?`<a class="chip" href="tel:+${esc(t.assignedToPhone)}" style="text-decoration:none">📞 +${esc(t.assignedToPhone)}</a>`:""}
         <span class="chip">📤 ${esc(t.assignedByName)}</span>
         ${t.due?`<span class="chip ${late?"late":""}">📅 ${esc(t.due)}${late?" (late)":""}</span>`:""}
       </div>
@@ -382,6 +426,11 @@ function render(){
 $("list").onclick=async e=>{
   const b=e.target.closest("button");if(!b)return;
   try{
+    if(b.dataset.a==="summary"){const arr=tab==="given"?tasks.filter(t=>t.assignedBy===me.uid):(canSeeAll()?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid));
+      window.open("https://wa.me/?text="+encodeURIComponent(summaryText(arr)),"_blank");return;}
+    if(b.dataset.a==="dsum"){const vis=canSeeAll()?reports:reports.filter(r=>r.assignedBy===me.uid);
+      window.open("https://wa.me/?text="+encodeURIComponent(dailySummary(sumDate||today(),vis)),"_blank");return;}
+    if(b.dataset.a==="seen"){try{localStorage.setItem(seenKey(),String(Date.now()));}catch(e){}render();return;}
     if(b.id==="r-cancel"){editRid=null;skipKeep=true;renderReport();return;}
     if(b.dataset.a==="redit"){editRid=b.dataset.id;skipKeep=true;renderReport();window.scrollTo(0,0);return;}
     if(b.id==="r-save"){
@@ -404,12 +453,23 @@ $("list").onclick=async e=>{
   const id=b.dataset.id, r=doc(db,"tasks",id), t=tasks.find(x=>x.id===id);
   try{
     if(b.dataset.a==="wa"&&t&&t.assignedToPhone)openWa(t.assignedToPhone,taskMsg(t,true));
-    if(b.dataset.a==="st")await updateDoc(r,{status:b.dataset.v});
+    if(b.dataset.a==="st"){
+      await updateDoc(r,{status:b.dataset.v});
+      try{
+        const rid="auto_"+id;
+        if(b.dataset.v==="done"){
+          const rr=roleOf(t.assignedBy);
+          await setDoc(doc(db,"tasks",rid),{type:"report",auto:true,teamId,date:today(),task:t.title,byRole:rr==="boss"?"CEO":rr==="manager"?"Manager":"Executive",
+            staff:t.assignedToName,status:"completed",update:"Task completed",remarks:"",next:"",assignedBy:me.uid,assignedByName:me.name,createdAt:serverTimestamp()});
+        }else await deleteDoc(doc(db,"tasks",rid));
+      }catch(e){}
+    }
     if(b.dataset.a==="note"){const n=prompt("Write an update / note:",t.note||"");if(n!==null)await updateDoc(r,{note:n.trim()});}
     if(b.dataset.a==="del"&&confirm("Delete this task?"))await deleteDoc(r);
   }catch(err){alert(errMsg(err));}
 };
 
+$("list").onchange=e=>{if(e.target.id==="r-sumdate"){sumDate=e.target.value||null;renderReport();}};
 $("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-to").value="";$("n-phone").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
 $("n-cancel").onclick=()=>$("modal").classList.add("hide");
 $("n-save").onclick=async()=>{

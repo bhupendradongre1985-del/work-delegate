@@ -65,6 +65,7 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
   <p class="sub">Assign work to your team and track status, live.</p>
   <div class="box">
     <input id="a-name" placeholder="Your name" class="hide">
+    <input id="a-phone" type="tel" placeholder="WhatsApp number (e.g. 9876543210)" class="hide">
     <input id="a-email" type="email" placeholder="Email" autocomplete="email">
     <input id="a-pass" type="password" placeholder="Password (at least 6 characters)" autocomplete="current-password">
     <div id="a-err" class="err"></div>
@@ -101,8 +102,8 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
   </header>
   <div class="tabs">
     <button data-t="mine" class="on">My Tasks</button>
-    <button data-t="given">Assigned by Me</button>
-    <button data-t="all">Whole Team</button>
+    <button data-t="given">Assigned</button>
+    <button data-t="all">Team</button>
     <button data-t="report">📋 Report</button>
   </div>
   <div class="wrap">
@@ -122,6 +123,8 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <textarea id="n-desc"></textarea>
     <label>Assign to</label>
     <input id="n-to" list="n-to-list" placeholder="Type a name or pick from team" autocomplete="off"><datalist id="n-to-list"></datalist>
+    <label>WhatsApp number (only if not in the team)</label>
+    <input id="n-phone" type="tel" placeholder="9876543210">
     <div class="row">
       <div><label>Last date</label><input id="n-due" type="date"></div>
       <div><label>Priority</label>
@@ -139,6 +142,9 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <h1 style="margin-top:0">Team Code</h1>
     <p class="sub">Share this code with your staff. They enter it under "Join with a code".</p>
     <div class="code" id="i-code"></div>
+    <label style="margin-top:12px">My WhatsApp number</label>
+    <input id="i-phone" type="tel" placeholder="9876543210">
+    <button id="i-phone-save" class="btn alt">Save my number</button>
     <p class="sub" style="margin-top:14px">Members:</p>
     <div id="i-members"></div>
     <button id="i-close" class="btn alt" style="margin-top:12px">Close</button>
@@ -176,6 +182,7 @@ const errMsg=e=>{const c=e.code||"";
 // ---------- AUTH ----------
 $("a-toggle").onclick=()=>{signup=!signup;
   $("a-name").classList.toggle("hide",!signup);
+  $("a-phone").classList.toggle("hide",!signup);
   $("a-go").textContent=signup?"Create Account":"Login";
   $("a-toggle").textContent=signup?"Already have an account? Log in":"Create a new account";
   $("a-err").textContent="";};
@@ -185,9 +192,10 @@ $("a-go").onclick=async()=>{
   try{
     if(signup){
       if(!name){$("a-err").textContent="Enter your name.";return;}
+      const phone=waNum($("a-phone").value); if(!phone){$("a-err").textContent="Enter a valid WhatsApp number.";return;}
       const c=await createUserWithEmailAndPassword(auth,email,pass);
       await updateProfile(c.user,{displayName:name});
-      await setDoc(doc(db,"users",c.user.uid),{name,email,teamId:null});
+      await setDoc(doc(db,"users",c.user.uid),{name,email,teamId:null,phone});
     }else await signInWithEmailAndPassword(auth,email,pass);
   }catch(e){$("a-err").textContent=errMsg(e);}
 };
@@ -201,7 +209,7 @@ onAuthStateChanged(auth,async u=>{
     // the user doc may still be created during signup
     let s=await getDoc(doc(db,"users",u.uid));
     if(!s.exists()){await setDoc(doc(db,"users",u.uid),{name:me.name,email:u.email,teamId:null});s=await getDoc(doc(db,"users",u.uid));}
-    teamId=s.data().teamId||null;
+    teamId=s.data().teamId||null; me.phone=s.data().phone||"";
     teamId?openTeam():show("team");
   }catch(e){show("team");$("t-err").textContent=errMsg(e);}
 });
@@ -215,7 +223,7 @@ $("t-create").onclick=async()=>{
   if(!name){$("t-err").textContent="Enter a team name.";return;}
   try{
     const code=genCode();
-    await setDoc(doc(db,"teams",code),{name,owner:me.uid,memberUids:[me.uid],members:[{uid:me.uid,name:me.name,role:"boss"}],createdAt:serverTimestamp()});
+    await setDoc(doc(db,"teams",code),{name,owner:me.uid,memberUids:[me.uid],members:[{uid:me.uid,name:me.name,role:"boss",phone:me.phone||""}],createdAt:serverTimestamp()});
     await updateDoc(doc(db,"users",me.uid),{teamId:code});
     teamId=code;openTeam();
   }catch(e){$("t-err").textContent=errMsg(e);}
@@ -228,7 +236,7 @@ $("t-join").onclick=async()=>{
     if(!s.exists()){$("t-err").textContent="Invalid team code.";return;}
     const d=s.data();
     if(!d.memberUids.includes(me.uid))
-      await updateDoc(r,{memberUids:arrayUnion(me.uid),members:arrayUnion({uid:me.uid,name:me.name,role:$("t-role").value})});
+      await updateDoc(r,{memberUids:arrayUnion(me.uid),members:arrayUnion({uid:me.uid,name:me.name,role:$("t-role").value,phone:me.phone||""})});
     await updateDoc(doc(db,"users",me.uid),{teamId:code});
     teamId=code;openTeam();
   }catch(e){$("t-err").textContent=errMsg(e);}
@@ -258,15 +266,27 @@ function fillMembers(){
 function renderInfo(){
   $("i-code").textContent=teamId;
   const boss=roleOf(me.uid)==="boss";
-  $("i-members").innerHTML=team.members.map(m=>{const isB=m.uid===team.owner;
-    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)"><span>'+esc(m.name)+' <small style="color:var(--mut)">'+RL[roleOf(m.uid)]+'</small></span>'+
-    (boss&&!isB?'<label style="margin:0;display:flex;gap:6px;align-items:center;white-space:nowrap"><input type="checkbox" style="width:auto;margin:0" data-seeall="'+esc(m.uid)+'"'+(m.seeAll!==false?" checked":"")+'> Can view all reports</label>':'')+'</div>';}).join("");
+  const hint=boss?'<p class="sub">Set each person\'s role. "Sees all" lets them view everyone\'s tasks and reports.</p>':'';
+  $("i-members").innerHTML=hint+team.members.map(m=>{const r=roleOf(m.uid);
+    const ctl=boss?'<select data-role="'+esc(m.uid)+'" style="width:auto;margin:0;padding:6px">'+["boss","manager","exec"].map(k=>'<option value="'+k+'"'+(r===k?" selected":"")+'>'+RL[k]+'</option>').join("")+'</select>'+
+      (r!=="boss"?'<label style="margin:0;display:flex;gap:6px;align-items:center;white-space:nowrap"><input type="checkbox" style="width:auto;margin:0" data-seeall="'+esc(m.uid)+'"'+(m.seeAll!==false?" checked":"")+'> Sees all</label>':''):'<small style="color:var(--mut)">'+RL[r]+'</small>';
+    return '<div style="display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)"><b>'+esc(m.name)+(m.uid===me.uid?" (you)":"")+'</b><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+ctl+'</div></div>';}).join("");
 }
-$("m-info").onclick=()=>$("info").classList.remove("hide");
+$("m-info").onclick=()=>{$("i-phone").value=((team&&team.members.find(m=>m.uid===me.uid))||{}).phone||me.phone||"";$("info").classList.remove("hide");};
+$("i-phone-save").onclick=async()=>{const ph=waNum($("i-phone").value);if(!ph){alert("Enter a valid WhatsApp number.");return;}
+  try{await updateDoc(doc(db,"users",me.uid),{phone:ph});me.phone=ph;
+    await updateDoc(doc(db,"teams",teamId),{members:team.members.map(m=>m.uid===me.uid?{...m,phone:ph}:m)});alert("Number saved ✅");}
+  catch(e){alert(errMsg(e));}};
 $("i-close").onclick=()=>$("info").classList.add("hide");
-$("i-members").onchange=async e=>{const u=e.target.dataset&&e.target.dataset.seeall;if(!u)return;
-  try{await updateDoc(doc(db,"teams",teamId),{members:team.members.map(m=>m.uid===u?{...m,seeAll:e.target.checked}:m)});}
-  catch(err){alert(errMsg(err));}};
+$("i-members").onchange=async e=>{const t=e.target, ds=t.dataset||{};
+  let members=null;
+  if(ds.seeall){members=team.members.map(m=>m.uid===ds.seeall?{...m,seeAll:t.checked}:m);}
+  else if(ds.role){
+    members=team.members.map(m=>m.uid===ds.role?{...m,role:t.value}:m);
+    if(!members.some(m=>(m.role||(m.uid===team.owner?"boss":"exec"))==="boss")){alert("The team needs at least one Boss.");renderInfo();return;}
+    if(t.value==="boss"&&!confirm("Give this person full Boss access?")){renderInfo();return;}
+  }else return;
+  try{await updateDoc(doc(db,"teams",teamId),{members});}catch(err){alert(errMsg(err));}};
 
 // ---------- TASKS ----------
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
@@ -274,8 +294,13 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
 
 const SL={todo:"To Do",doing:"In Progress",done:"Done"};
 const RL={boss:"Boss",manager:"SEO Manager",exec:"Executive"};
-const roleOf=uid=>{if(!team)return"exec";if(uid===team.owner)return"boss";const m=team.members.find(x=>x.uid===uid);return(m&&m.role)||"exec";};
+const roleOf=uid=>{if(!team)return"exec";const m=team.members.find(x=>x.uid===uid);if(m&&m.role)return m.role;return uid===team.owner?"boss":"exec";};
+const canSeeAll=()=>{if(!team)return false;if(roleOf(me.uid)==="boss")return true;const m=team.members.find(x=>x.uid===me.uid);return !m||m.seeAll!==false;};
 let reports=[];
+const waNum=raw=>{let d=String(raw||"").replace(/\D/g,"").replace(/^0+/,"");if(d.length===10)d="91"+d;return d.length>=11?d:"";};
+const PRL={high:"Urgent",med:"Normal",low:"Low"};
+const taskMsg=(t,rem)=>(rem?"⏰ Reminder: pending task":"📋 New task from GS TEAM")+"\n\nTask: "+t.title+(t.desc?"\nDetails: "+t.desc:"")+"\nAssigned by: "+t.assignedByName+(t.due?"\nDeadline: "+t.due:"")+"\nPriority: "+(PRL[t.priority]||"Normal")+"\n\nPlease update the status in the GS TEAM app.";
+const openWa=(ph,text)=>window.open("https://wa.me/"+ph+"?text="+encodeURIComponent(text),"_blank");
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 
 const RST={notstarted:"Not Started",inprogress:"In Progress",pending:"Pending",completed:"Completed"};
@@ -297,9 +322,9 @@ function renderReport(){
   skipKeep=false;
   const d=cur||ed||{};
   const opt=(val,lab,sel)=>'<option value="'+val+'"'+(sel===val?" selected":"")+'>'+lab+'</option>';
-  const isMgr=team&&(roleOf(me.uid)==="boss"||(team.members.find(m=>m.uid===me.uid)||{}).seeAll!==false);
+  const seeAll=canSeeAll();
   const st=dayStats(me.uid,td);
-  const visible=reports;
+  const visible=seeAll?reports:reports.filter(r=>r.assignedBy===me.uid);
   let h='<div class="box"><b>📋 Daily Follow-Up Report</b><p class="sub" style="margin:4px 0 10px">Date: '+td+(ed?' · <b>Edit mode</b>':'')+'</p>'+
     '<label>Task</label><input id="r-task" value="'+esc(d.task||"")+'" placeholder="Task name">'+
     '<label>Assigned By</label><select id="r-by">'+["CEO","Manager","Executive"].map(x=>opt(x,x,d.byRole||"Manager")).join("")+'</select>'+
@@ -311,7 +336,7 @@ function renderReport(){
     '<button id="r-save" class="btn">'+(ed?"Update":"Save Report")+'</button>'+
     (ed?'<button id="r-cancel" class="link">Edit cancel</button>':'')+'</div>';
   h+='<div class="box"><b>📊 Daily Summary for Today (yours)</b><p class="sub" style="margin:6px 0 0">Assigned: <b>'+st.n+'</b> · Completed: <b>'+st.c+'</b> · In Progress: <b>'+st.p+'</b> · Pending: <b>'+st.pe+'</b></p></div>';
-  h+='<p class="sub">All team reports</p>';
+  h+='<p class="sub">'+(seeAll?"All team reports":"Your reports")+'</p>';
   if(!visible.length)h+='<div class="empty">No reports yet.</div>';
   h+=visible.map(r=>'<div class="task p-'+(r.status==="completed"?"low":r.status==="pending"?"high":"med")+'"><h3>'+esc(r.task)+'</h3>'+
     '<div class="meta"><span class="chip">👤 '+esc(r.assignedByName)+'</span><span class="chip">📅 '+esc(r.date)+'</span><span class="chip">'+esc(RST[r.status]||"")+'</span>'+
@@ -326,10 +351,10 @@ function render(){
   $("fab").classList.toggle("hide",tab==="report"||roleOf(me.uid)==="exec");
   if(tab==="report"){renderReport();return;}
   const mine=tasks.filter(t=>t.assignedTo===me.uid), given=tasks.filter(t=>t.assignedBy===me.uid);
-  const set=tab==="mine"?mine:tab==="given"?given:tasks;
+  const set=tab==="mine"?mine:tab==="given"?given:(canSeeAll()?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid));
   const cnt=k=>set.filter(t=>t.status===k).length;
   let sum="";
-  if(tab==="all"&&team){sum='<div class="box"><b>👥 Team Progress</b>'+team.members.map(m=>{
+  if(tab==="all"&&team&&canSeeAll()){sum='<div class="box"><b>👥 Team Progress</b>'+team.members.map(m=>{
     const t=tasks.filter(x=>x.assignedTo===m.uid), d=t.filter(x=>x.status==="done").length,
       late=t.filter(x=>x.due&&x.due<today()&&x.status!=="done").length;
     return '<div style="display:flex;justify-content:space-between;gap:8px;padding-top:8px;margin-top:8px;border-top:1px solid var(--line)"><span>'+esc(m.name)+' <small style="color:var(--mut)">'+RL[roleOf(m.uid)]+'</small></span><span>'+d+'/'+t.length+' done'+(late?' · <b style="color:var(--bad)">'+late+' late</b>':'')+'</span></div>';}).join("")+'</div>';}
@@ -350,6 +375,7 @@ function render(){
       <div class="acts">
         ${canMove?["todo","doing","done"].map(k=>`<button class="${t.status===k?"cur":""}" data-a="st" data-id="${t.id}" data-v="${k}">${SL[k]}</button>`).join(""):""}
         ${canMove?`<button data-a="note" data-id="${t.id}">📝 Note</button>`:""}
+        ${t.assignedBy===me.uid&&t.assignedToPhone?`<button data-a="wa" data-id="${t.id}">💬 WhatsApp</button>`:""}
         ${t.assignedBy===me.uid?`<button class="del" data-a="del" data-id="${t.id}">🗑</button>`:""}
       </div></div>`;}).join("");
 }
@@ -377,13 +403,14 @@ $("list").onclick=async e=>{
   }catch(err){if(err.name!=="AbortError")alert(errMsg(err));return;}
   const id=b.dataset.id, r=doc(db,"tasks",id), t=tasks.find(x=>x.id===id);
   try{
+    if(b.dataset.a==="wa"&&t&&t.assignedToPhone)openWa(t.assignedToPhone,taskMsg(t,true));
     if(b.dataset.a==="st")await updateDoc(r,{status:b.dataset.v});
     if(b.dataset.a==="note"){const n=prompt("Write an update / note:",t.note||"");if(n!==null)await updateDoc(r,{note:n.trim()});}
     if(b.dataset.a==="del"&&confirm("Delete this task?"))await deleteDoc(r);
   }catch(err){alert(errMsg(err));}
 };
 
-$("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-to").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
+$("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-to").value="";$("n-phone").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
 $("n-cancel").onclick=()=>$("modal").classList.add("hide");
 $("n-save").onclick=async()=>{
   const title=$("n-title").value.trim(); if(!title){$("n-err").textContent="Enter the task name.";return;}
@@ -391,9 +418,12 @@ $("n-save").onclick=async()=>{
   const to=team.members.find(m=>m.name.toLowerCase()===nm.toLowerCase());
   const toUid=to?to.uid:"", toName=to?to.name:nm;
   try{
-    await addDoc(collection(db,"tasks"),{teamId,title,desc:$("n-desc").value.trim(),assignedTo:toUid,assignedToName:toName,
-      assignedBy:me.uid,assignedByName:me.name,due:$("n-due").value||"",priority:$("n-pri").value,status:"todo",note:"",createdAt:serverTimestamp()});
+    const ph=(to&&to.phone)?to.phone:waNum($("n-phone").value);
+    const task={teamId,title,desc:$("n-desc").value.trim(),assignedTo:toUid,assignedToName:toName,assignedToPhone:ph,
+      assignedBy:me.uid,assignedByName:me.name,due:$("n-due").value||"",priority:$("n-pri").value,status:"todo",note:"",createdAt:serverTimestamp()};
+    await addDoc(collection(db,"tasks"),task);
     $("modal").classList.add("hide");
+    if(ph&&confirm("Task saved. Send a WhatsApp message to "+toName+" now?"))openWa(ph,taskMsg(task));
   }catch(e){$("n-err").textContent=errMsg(e);}
 };
 </script>

@@ -121,7 +121,7 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <label>Details (optional)</label>
     <textarea id="n-desc"></textarea>
     <label>Assign to</label>
-    <select id="n-to"></select>
+    <input id="n-to" list="n-to-list" placeholder="Type a name or pick from team" autocomplete="off"><datalist id="n-to-list"></datalist>
     <div class="row">
       <div><label>Last date</label><input id="n-due" type="date"></div>
       <div><label>Priority</label>
@@ -253,7 +253,7 @@ function openTeam(){
 function fillMembers(){
   const r=roleOf(me.uid);
   const list=team.members.filter(m=>r==="boss"||m.uid===me.uid||roleOf(m.uid)==="exec");
-  $("n-to").innerHTML=list.map(m=>`<option value="${esc(m.uid)}">${esc(m.name)} (${RL[roleOf(m.uid)]})${m.uid===me.uid?" - you":""}</option>`).join("");
+  $("n-to-list").innerHTML=list.map(m=>`<option value="${esc(m.name)}">${esc(RL[roleOf(m.uid)])}${m.uid===me.uid?" - you":""}</option>`).join("");
 }
 function renderInfo(){
   $("i-code").textContent=teamId;
@@ -383,13 +383,15 @@ $("list").onclick=async e=>{
   }catch(err){alert(errMsg(err));}
 };
 
-$("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
+$("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-to").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
 $("n-cancel").onclick=()=>$("modal").classList.add("hide");
 $("n-save").onclick=async()=>{
   const title=$("n-title").value.trim(); if(!title){$("n-err").textContent="Enter the task name.";return;}
-  const toUid=$("n-to").value, to=team.members.find(m=>m.uid===toUid);
+  const nm=$("n-to").value.trim(); if(!nm){$("n-err").textContent="Enter who the task is for.";return;}
+  const to=team.members.find(m=>m.name.toLowerCase()===nm.toLowerCase());
+  const toUid=to?to.uid:"", toName=to?to.name:nm;
   try{
-    await addDoc(collection(db,"tasks"),{teamId,title,desc:$("n-desc").value.trim(),assignedTo:toUid,assignedToName:to.name,
+    await addDoc(collection(db,"tasks"),{teamId,title,desc:$("n-desc").value.trim(),assignedTo:toUid,assignedToName:toName,
       assignedBy:me.uid,assignedByName:me.name,due:$("n-due").value||"",priority:$("n-pri").value,status:"todo",note:"",createdAt:serverTimestamp()});
     $("modal").classList.add("hide");
   }catch(e){$("n-err").textContent=errMsg(e);}

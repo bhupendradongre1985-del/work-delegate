@@ -1,58 +1,97 @@
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f6feb">
+<meta name="theme-color" content="#12263f">
 <title>GS TEAM</title>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--ink:#1b2333;--mut:#6b7686;--pri:#1f6feb;--ok:#1a9d5b;--warn:#e08a00;--bad:#d64545;--line:#e3e8f0}
+:root{--bg:#f5f6f8;--card:#fff;--ink:#17202b;--mut:#5d6b7b;--pri:#1b4b82;--navy:#12263f;--ok:#1e7f58;--warn:#b4690e;--bad:#b83a2e;--line:#dde1e7;--soft:#eef1f5}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-top:env(safe-area-inset-top)}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);padding-top:env(safe-area-inset-top);font-variant-numeric:tabular-nums}
 .hide{display:none!important}
-.wrap{max-width:560px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:8px 0 4px}
-p.sub{color:var(--mut);margin:0 0 16px;font-size:14px}
+.wrap{max-width:600px;margin:0 auto;padding:16px 16px 96px}
+h1{font-size:22px;line-height:1.2;margin:0 0 4px;font-weight:650}
+p.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
+small{color:var(--mut)}
 input,select,textarea,button{font:inherit}
-input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px}
-textarea{min-height:70px;resize:vertical}
-button{border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #c9d0d9;border-radius:8px;background:#fff;margin-bottom:12px;color:var(--ink)}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+textarea{min-height:76px;resize:vertical}
+button{border:0;border-radius:8px;padding:11px 16px;font-weight:600;cursor:pointer}
 .btn{background:var(--pri);color:#fff;width:100%}
-.btn.alt{background:#e8eefc;color:var(--pri)}
-.link{background:none;color:var(--pri);width:100%;padding:8px}
-.box{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(20,30,60,.06)}
+.btn.alt{background:#fff;color:var(--pri);border:1px solid #b9c5d6}
+.link{background:none;color:var(--pri);width:100%;padding:10px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.box>.hd:only-child{margin-bottom:0}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;font-weight:650}
+.hd span+span{font-weight:500;color:var(--mut);font-size:14px}
+.sec{font-weight:650;font-size:14px;margin:18px 2px 8px}
 .err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
-header{background:var(--pri);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-header b{font-size:17px}
-header small{display:block;opacity:.85;font-size:12px}
-header button{background:rgba(255,255,255,.18);color:#fff;padding:8px 12px;font-size:13px}
-.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:4}
-.tabs button{flex:1;background:none;border-radius:0;padding:13px 2px;color:var(--mut);font-size:13px;border-bottom:3px solid transparent}
-.tabs button.on{color:var(--pri);border-bottom-color:var(--pri)}
-.task{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,30,60,.06);border-left:5px solid var(--line)}
-.task.p-high{border-left-color:var(--bad)}.task.p-med{border-left-color:var(--warn)}.task.p-low{border-left-color:var(--ok)}
-.task.done{opacity:.65}
-.task h3{margin:0 0 4px;font-size:16px}
-.task .d{color:var(--mut);font-size:13px;margin:0 0 8px;white-space:pre-wrap}
-.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;margin-bottom:10px}
-.chip{background:#eef2f8;border-radius:20px;padding:4px 10px;color:#3b4660}
-.chip.late{background:#fde8e8;color:var(--bad)}
-.note{background:#fffbe6;border-radius:8px;padding:8px;font-size:13px;margin-bottom:10px}
+.mono{width:44px;height:44px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;letter-spacing:.5px;margin:24px 0 14px}
+header{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:5}
+header b{font-size:17px;font-weight:650}
+header small{display:block;color:#fff;opacity:.72;font-size:12px}
+header button{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;padding:7px 12px;font-size:13px;font-weight:500}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:4}
+.tabs button{flex:1 1 auto;white-space:nowrap;background:none;border-radius:0;padding:13px 6px;color:var(--mut);font-size:13px;text-align:center;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--navy);border-bottom-color:var(--navy)}
+.task{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.task.done{opacity:.72}
+.th{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px}
+.task h3{margin:0;font-size:16px;font-weight:650;overflow-wrap:anywhere}
+.task .d{color:var(--mut);font-size:14px;margin:2px 0 8px;white-space:pre-wrap}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:var(--soft);color:#44525f}
+.tag.p-high{background:#fbe6e3;color:var(--bad)}
+.tag.p-med{background:#fbefdc;color:var(--warn)}
+.tag.p-low,.tag.s-pending,.tag.s-notstarted{background:var(--soft);color:#44525f}
+.tag.s-completed{background:#e0f2ea;color:var(--ok)}
+.tag.s-inprogress{background:#fbefdc;color:var(--warn)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:8px 0 12px;font-size:13px}
+.kv dt{color:var(--mut)}
+.kv dd{margin:0}
+.kv a{color:var(--pri);text-decoration:none;margin-left:6px}
+.bad{color:var(--bad)}
+.note{background:var(--soft);border-radius:8px;padding:9px 11px;font-size:13px;margin:0 0 10px}
+.note.bad{background:#fbe6e3;color:#7e271f}
+.note.info{background:#e8f0fa;color:#1b3f6b;margin-bottom:12px}
+.seg{display:flex;border:1px solid #b9c5d6;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.seg button{flex:1;border-radius:0;background:#fff;color:var(--mut);padding:9px 4px;font-size:13px;border-right:1px solid #d3dae3}
+.seg button:last-child{border-right:0}
+.seg button.cur{background:var(--navy);color:#fff}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
-.acts button{padding:8px 10px;font-size:13px;background:#eef2f8;color:#3b4660}
-.acts button.cur{background:var(--pri);color:#fff}
-.acts button.del{background:#fde8e8;color:var(--bad);margin-left:auto}
-.empty{text-align:center;color:var(--mut);padding:40px 10px}
-.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:auto;border-radius:30px;padding:15px 22px;box-shadow:0 4px 14px rgba(31,111,235,.45);z-index:6}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
-.sheet{background:#fff;width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px;max-width:560px;margin:0 auto}
+.acts:empty{display:none}
+.acts button{padding:8px 12px;font-size:13px;background:var(--soft);color:#33414f;font-weight:500}
+.acts button.ok{background:var(--ok);color:#fff}
+.acts button.del{background:none;color:var(--bad);margin-left:auto}
+.mini{padding:5px 10px;font-size:12px;margin-left:8px;background:#fff;border:1px solid #b9c5d6;color:var(--pri)}
+.empty{text-align:center;color:var(--mut);padding:36px 12px;font-size:14px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:auto;border-radius:10px;padding:13px 20px;background:var(--navy);box-shadow:0 2px 8px rgba(18,38,63,.3);z-index:6}
+.modal{position:fixed;inset:0;background:rgba(18,38,63,.5);display:flex;align-items:flex-end;z-index:20}
+.sheet{background:#fff;width:100%;max-height:92vh;overflow:auto;border-radius:14px 14px 0 0;padding:18px;max-width:600px;margin:0 auto}
 label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
 .row{display:flex;gap:10px}.row>div{flex:1}
-.code{font-size:26px;letter-spacing:4px;font-weight:800;color:var(--pri);text-align:center}
-.stat{display:flex;gap:8px;margin-bottom:12px}
-.stat div{flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--mut)}
+.code{font-size:28px;letter-spacing:6px;font-weight:700;color:var(--navy);text-align:center;background:var(--soft);border-radius:8px;padding:12px;margin-bottom:6px}
+.stat{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+.stat:empty{display:none}
+.stat div{flex:1;padding:10px;text-align:center;font-size:12px;color:var(--mut)}
+.stat div+div{border-left:1px solid var(--line)}
 .stat b{display:block;font-size:20px;color:var(--ink)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:#e6eaf0}
+.bar.sm{height:6px}
+.bar i{display:block;height:100%}
+.figs{display:grid;grid-template-columns:repeat(4,1fr);margin-top:14px}
+.figs div{padding-left:10px;border-left:1px solid var(--line)}
+.figs div:first-child{padding-left:0;border-left:0}
+.figs b{display:block;font-size:24px;line-height:1.1;font-weight:650}
+.figs span{font-size:12px;color:var(--mut)}
+.figs.att b{font-size:17px;white-space:nowrap}
+.pr1{flex-wrap:wrap}.pr1 span:last-child{text-align:right}
+.prow{margin-top:12px}
+.pr1{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:5px}
+.pre{background:var(--soft);border-radius:8px;padding:10px;font-size:13px;white-space:pre-wrap;margin:0 0 10px}
 .spin{text-align:center;padding:60px;color:var(--mut)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -61,8 +100,9 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
 
 <!-- LOGIN -->
 <div id="auth" class="wrap hide">
-  <h1>📋 GS TEAM</h1>
-  <p class="sub">Assign work to your team and track status, live.</p>
+  <div class="mono">GS</div>
+  <h1>GS TEAM</h1>
+  <p class="sub">Assign work, follow up and review reports in one place.</p>
   <div class="box">
     <input id="a-name" placeholder="Your name">
     <input id="a-phone" type="tel" placeholder="WhatsApp number (e.g. 9876543210)">
@@ -102,23 +142,24 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <div><button id="m-info">Team Code</button> <button id="m-logout">Logout</button></div>
   </header>
   <div class="tabs">
-    <button data-t="mine" class="on">My Tasks</button>
+    <button data-t="dash" class="on">Dashboard</button>
+    <button data-t="mine">My tasks</button>
     <button data-t="given">Assigned</button>
     <button data-t="all">Team</button>
-    <button data-t="report">📋 Report</button>
+    <button data-t="report">Report</button>
   </div>
   <div class="wrap">
     <div class="stat" id="stat"></div>
     <div id="list"></div>
   </div>
-  <button id="fab" class="btn fab">+ New Task</button>
+  <button id="fab" class="btn fab">New task</button>
 </div>
 
 <!-- NEW TASK -->
 <div id="modal" class="modal hide">
   <div class="sheet">
-    <h1 style="margin-top:0">Assign a New Task</h1>
-    <label>What is the task?</label>
+    <h1 style="margin-top:0;margin-bottom:12px">New task</h1>
+    <label>Task</label>
     <input id="n-title" placeholder="e.g. Prepare the monthly report">
     <label>Details (optional)</label>
     <textarea id="n-desc"></textarea>
@@ -129,10 +170,10 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <div class="row">
       <div><label>Last date</label><input id="n-due" type="date"></div>
       <div><label>Priority</label>
-        <select id="n-pri"><option value="high">🔴 Urgent</option><option value="med" selected>🟠 Normal</option><option value="low">🟢 Low</option></select></div>
+        <select id="n-pri"><option value="high">Urgent</option><option value="med" selected>Normal</option><option value="low">Low</option></select></div>
     </div>
     <div id="n-err" class="err"></div>
-    <button id="n-save" class="btn">Send Task</button>
+    <button id="n-save" class="btn">Assign task</button>
     <button id="n-cancel" class="link">Cancel</button>
   </div>
 </div>
@@ -146,6 +187,13 @@ label{font-size:13px;color:var(--mut);display:block;margin:2px 0 4px}
     <label style="margin-top:12px">My WhatsApp number</label>
     <input id="i-phone" type="tel" placeholder="9876543210">
     <button id="i-phone-save" class="btn alt">Save my number</button>
+    <div id="i-office" class="hide">
+      <p class="sub" style="margin-top:14px"><b>Office location</b> (for attendance)</p>
+      <p id="i-office-st" class="sub"></p>
+      <label>Allowed distance from office</label>
+      <select id="i-office-r"><option value="50">50 m</option><option value="100">100 m</option><option value="150" selected>150 m</option><option value="200">200 m</option><option value="300">300 m</option></select>
+      <button id="i-office-set" class="btn alt">Set office location here</button>
+    </div>
     <p class="sub" style="margin-top:14px">Members:</p>
     <div id="i-members"></div>
     <button id="i-close" class="btn alt" style="margin-top:12px">Close</button>
@@ -169,7 +217,7 @@ if(!window.FIREBASE_CONFIG||FIREBASE_CONFIG.apiKey==="YAHAN_APIKEY"){
 const app=initializeApp(FIREBASE_CONFIG);
 const auth=getAuth(app), db=getFirestore(app);
 
-let me=null, teamId=null, team=null, tab="mine", tasks=[], unsubTasks=null, unsubTeam=null, signup=false;
+let me=null, teamId=null, team=null, tab="dash", tasks=[], unsubTasks=null, unsubTeam=null, signup=false;
 
 const errMsg=e=>{const c=e.code||"";
   if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found"))return"Incorrect email or password.";
@@ -229,7 +277,7 @@ async function handleUser(u){
   }catch(e){show("team");$("t-err").textContent=errMsg(e);}
 }
 
-function cleanup(){unsubTasks&&unsubTasks();unsubTeam&&unsubTeam();unsubTasks=unsubTeam=null;tasks=[];team=null;}
+function cleanup(){healed=false;unsubTasks&&unsubTasks();unsubTeam&&unsubTeam();unsubTasks=unsubTeam=null;tasks=[];team=null;}
 
 // ---------- TEAM ----------
 const genCode=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;};
@@ -262,13 +310,19 @@ function openTeam(){
   $("m-user").textContent=me.name;
   unsubTeam=onSnapshot(doc(db,"teams",teamId),s=>{
     if(!s.exists())return; team=s.data();
+    const mm=team.members.find(m=>m.uid===me.uid);
+    if(mm&&mm.name!==me.name&&!healed){healed=true;updateDoc(doc(db,"teams",teamId),{members:team.members.map(m=>m.uid===me.uid?{...m,name:me.name}:m)}).catch(()=>{});}
     $("m-team").textContent=team.name; fillMembers(); renderInfo(); render();
   });
   unsubTasks=onSnapshot(query(collection(db,"tasks"),where("teamId","==",teamId)),s=>{
     const all=s.docs.map(d=>({id:d.id,...d.data()}));
     reports=all.filter(t=>t.type==="report").sort((a,b)=>(b.date||"").localeCompare(a.date||""));
-    tasks=all.filter(t=>t.type!=="report");
+    reviews=all.filter(t=>t.type==="review");
+    att=all.filter(t=>t.type==="attendance");
+    offices=all.filter(t=>t.type==="office");
+    tasks=all.filter(t=>!t.type);
     tasks.sort((a,b)=>(a.status==="done")-(b.status==="done")||(a.due||"9999").localeCompare(b.due||"9999"));
+    if(team)renderInfo();
     render();
   },e=>{$("list").innerHTML=`<div class="empty">${esc(errMsg(e))}</div>`;});
 }
@@ -280,6 +334,8 @@ function fillMembers(){
 }
 function renderInfo(){
   $("i-code").textContent=teamId;
+  $("i-office").classList.toggle("hide",roleOf(me.uid)!=="boss");
+  const oo=getOffice(); $("i-office-st").textContent=oo?"Office location is set. Check-in works within "+oo.radius+" m of it.":"Not set yet. Stand inside the office and tap the button below. Until then, check-in works from anywhere.";
   const boss=roleOf(me.uid)==="boss";
   const hint=boss?'<p class="sub">Set each person\'s role. "Sees all" lets them view everyone\'s tasks and reports.</p>':'';
   $("i-members").innerHTML=hint+team.members.map(m=>{const r=roleOf(m.uid);
@@ -290,8 +346,15 @@ function renderInfo(){
 $("m-info").onclick=()=>{$("i-phone").value=((team&&team.members.find(m=>m.uid===me.uid))||{}).phone||me.phone||"";$("info").classList.remove("hide");};
 $("i-phone-save").onclick=async()=>{const ph=waNum($("i-phone").value);if(!ph){alert("Enter a valid WhatsApp number.");return;}
   try{await updateDoc(doc(db,"users",me.uid),{phone:ph});me.phone=ph;
-    await updateDoc(doc(db,"teams",teamId),{members:team.members.map(m=>m.uid===me.uid?{...m,phone:ph}:m)});alert("Number saved ✅");}
+    await updateDoc(doc(db,"teams",teamId),{members:team.members.map(m=>m.uid===me.uid?{...m,phone:ph}:m)});alert("Number saved.");}
   catch(e){alert(errMsg(e));}};
+$("i-office-set").onclick=async()=>{const btn=$("i-office-set"),old=btn.textContent;btn.disabled=true;btn.textContent="Getting location...";
+  try{const pos=await getPos();
+    if((pos.acc||0)>100&&!confirm("GPS accuracy is low (about "+Math.round(pos.acc)+" m). Set the office location anyway?"))return;
+    await setDoc(doc(db,"tasks","office_"+me.uid),{type:"office",teamId,lat:pos.lat,lng:pos.lng,radius:Number($("i-office-r").value)||150,byName:me.name,assignedBy:me.uid,at:serverTimestamp()});
+    alert("Office location saved.");}
+  catch(e){alert(e.message||errMsg(e));}
+  finally{btn.disabled=false;btn.textContent=old;}};
 $("i-close").onclick=()=>$("info").classList.add("hide");
 $("i-members").onchange=async e=>{const t=e.target, ds=t.dataset||{};
   let members=null;
@@ -307,11 +370,11 @@ $("i-members").onchange=async e=>{const t=e.target, ds=t.dataset||{};
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   tab=b.dataset.t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));render();});
 
-const SL={todo:"To Do",doing:"In Progress",done:"Done"};
+const SL={todo:"To do",doing:"In progress",done:"Done"};
 const RL={boss:"Boss",manager:"SEO Manager",exec:"Executive"};
 const roleOf=uid=>{if(!team)return"exec";const m=team.members.find(x=>x.uid===uid);if(m&&m.role)return m.role;return uid===team.owner?"boss":"exec";};
 const canSeeAll=()=>{if(!team)return false;if(roleOf(me.uid)==="boss")return true;const m=team.members.find(x=>x.uid===me.uid);return !m||m.seeAll!==false;};
-let reports=[];
+let reports=[], att=[], offices=[], attDate=null;
 const summaryText=arr=>{
   const by={}; arr.forEach(t=>{(by[t.assignedToName]=by[t.assignedToName]||[]).push(t);});
   const L=(label,list)=>list.length?"\n"+label+" ("+list.length+"): "+list.map(t=>t.title+(t.due&&t.due<today()&&t.status!=="done"?" [LATE]":"")).join(", "):"";
@@ -319,7 +382,13 @@ const summaryText=arr=>{
   Object.keys(by).forEach(n=>{const a=by[n];out+="\n👤 "+n+L("✅ Done",a.filter(x=>x.status==="done"))+L("🔄 In Progress",a.filter(x=>x.status==="doing"))+L("⏳ Pending",a.filter(x=>x.status==="todo"))+"\n";});
   const c=k=>arr.filter(x=>x.status===k).length;
   return out+"\nTOTAL: "+arr.length+" assigned · "+c("done")+" done · "+c("doing")+" in progress · "+c("todo")+" pending";};
-let sumDate=null;
+let sumDate=null, healed=false, reviews=[];
+const ms=v=>v&&v.toMillis?v.toMillis():Number.MAX_SAFE_INTEGER;
+const reviewOf=r=>{const ca=r.createdAt&&r.createdAt.toMillis?r.createdAt.toMillis():0;
+  const rs=reviews.filter(v=>v.reportId===r.id&&ms(v.at)>=ca).sort((a,b)=>ms(b.at)-ms(a.at));
+  return rs[0]?{state:rs[0].state,by:rs[0].byName}:{state:"pending"};};
+const reviewText=r=>{if(r.status!=="completed")return"";const v=reviewOf(r);
+  return v.state==="approved"?"Approved by "+esc(v.by):v.state==="rework"?"Rework requested by "+esc(v.by):"Waiting for CEO review";};
 const dailySummary=(date,arr)=>{
   const day=arr.filter(r=>r.date===date), by={};
   day.forEach(r=>{(by[r.assignedByName]=by[r.assignedByName]||[]).push(r);});
@@ -346,88 +415,160 @@ const dayStats=(uid,date)=>{const a=reports.filter(r=>r.assignedBy===uid&&r.date
 const reportText=r=>{const s=dayStats(r.assignedBy,r.date);
   return "📋 DAILY FOLLOW-UP REPORT\n\nDate: "+r.date+"\n\nTASK DETAILS\nTask: "+r.task+"\nAssigned By: "+r.byRole+"\nFollow-up Staff: "+r.staff+
   "\n\nFOLLOW-UP STATUS\n"+Object.keys(RST).map(k=>(r.status===k?"☑ ":"☐ ")+RST[k]).join("\n")+
-  "\n\nUPDATE\nLatest Update: "+(r.update||"-")+"\nRemarks: "+(r.remarks||"-")+"\nNext Follow-up: "+(r.next||"-")+
+  "\n\nUPDATE\nLatest Update: "+(r.update||"-")+"\nProgress: "+(r.progress!=null&&r.progress!==""?r.progress+"%":"-")+"\nProblem: "+(r.problem||"-")+"\nRemarks: "+(r.remarks||"-")+"\nNext Follow-up: "+(r.next||"-")+
   "\n\nDAILY SUMMARY\nAssigned: "+s.n+"  Completed: "+s.c+"  In Progress: "+s.p+"  Pending: "+s.pe+"\n\nSubmitted By: "+r.assignedByName;};
 
+const fig=(n,l,col)=>'<div><b'+(col?' style="color:'+col+'"':'')+'>'+n+'</b><span>'+l+'</span></div>';
 function renderReport(){
   $("stat").innerHTML="";
   const td=today(), ed=editRid?reports.find(x=>x.id===editRid):null;
   const cur=(!skipKeep&&$("r-task"))?{task:$("r-task").value,byRole:$("r-by").value,staff:$("r-staff").value,status:$("r-status").value,
-    update:$("r-update").value,remarks:$("r-remarks").value,next:$("r-next").value}:null;
+    update:$("r-update").value,remarks:$("r-remarks").value,next:$("r-next").value,progress:$("r-prog").value,problem:$("r-prob").value}:null;
   skipKeep=false;
   const d=cur||ed||{};
   const opt=(val,lab,sel)=>'<option value="'+val+'"'+(sel===val?" selected":"")+'>'+lab+'</option>';
-  const seeAll=canSeeAll();
+  const seeAll=canSeeAll(), boss=roleOf(me.uid)==="boss";
   const st=dayStats(me.uid,td);
   const visible=seeAll?reports:reports.filter(r=>r.assignedBy===me.uid);
-  let h='<div class="box"><b>📋 Daily Follow-Up Report</b><p class="sub" style="margin:4px 0 10px">Date: '+td+(ed?' · <b>Edit mode</b>':'')+'</p>'+
+  let h='<div class="box"><div class="hd"><span>Daily follow-up report</span><span>'+td+(ed?' (editing)':'')+'</span></div>'+
     '<label>Task</label><input id="r-task" value="'+esc(d.task||"")+'" placeholder="Task name">'+
-    '<label>Assigned By</label><select id="r-by">'+["CEO","Manager","Executive"].map(x=>opt(x,x,d.byRole||"Manager")).join("")+'</select>'+
-    '<label>Follow-up Staff</label><input id="r-staff" value="'+esc(d.staff||"")+'" placeholder="Staff name">'+
-    '<label>Follow-up Status</label><select id="r-status">'+Object.keys(RST).map(k=>opt(k,RST[k],d.status||"notstarted")).join("")+'</select>'+
-    '<label>Latest Update</label><textarea id="r-update">'+esc(d.update||"")+'</textarea>'+
+    '<label>Assigned by</label><select id="r-by">'+["CEO","Manager","Executive"].map(x=>opt(x,x,d.byRole||"Manager")).join("")+'</select>'+
+    '<label>Follow-up staff</label><input id="r-staff" value="'+esc(d.staff||"")+'" placeholder="Staff name">'+
+    '<label>Status</label><select id="r-status">'+Object.keys(RST).map(k=>opt(k,RST[k],d.status||"notstarted")).join("")+'</select>'+
+    '<label>Progress (0-100%)</label><input id="r-prog" type="number" min="0" max="100" inputmode="numeric" value="'+esc(d.progress??"")+'" placeholder="e.g. 60">'+
+    '<label>Latest update</label><textarea id="r-update">'+esc(d.update||"")+'</textarea>'+
+    '<label>Problem or issue (if any)</label><input id="r-prob" value="'+esc(d.problem||"")+'">'+
     '<label>Remarks</label><input id="r-remarks" value="'+esc(d.remarks||"")+'">'+
-    '<label>Next Follow-up</label><input id="r-next" type="date" value="'+esc(d.next||"")+'">'+
-    '<button id="r-save" class="btn">'+(ed?"Update":"Save Report")+'</button>'+
-    (ed?'<button id="r-cancel" class="link">Edit cancel</button>':'')+'</div>';
-  h+='<div class="box"><b>📊 Daily Summary for Today (yours)</b><p class="sub" style="margin:6px 0 0">Assigned: <b>'+st.n+'</b> · Completed: <b>'+st.c+'</b> · In Progress: <b>'+st.p+'</b> · Pending: <b>'+st.pe+'</b></p></div>';
+    '<label>Next follow-up</label><input id="r-next" type="date" value="'+esc(d.next||"")+'">'+
+    '<button id="r-save" class="btn">'+(ed?"Update report":"Save report")+'</button>'+
+    (ed?'<button id="r-cancel" class="link">Cancel editing</button>':'')+'</div>';
+  h+='<div class="box"><div class="hd"><span>Your summary for today</span></div><div class="figs">'+fig(st.n,"Assigned")+fig(st.c,"Completed","var(--ok)")+fig(st.p,"In progress","var(--warn)")+fig(st.pe,"Pending")+'</div></div>';
   const sd=sumDate||td;
-  h+='<div class="box"><b>📅 Daily Work Summary</b><label style="margin-top:8px">Date</label><input id="r-sumdate" type="date" value="'+esc(sd)+'">'+
-    '<p class="d" style="background:#f4f6fb;border-radius:10px;padding:10px;margin:0 0 10px">'+esc(dailySummary(sd,visible))+'</p>'+
-    '<button class="btn alt" data-a="dsum">📤 Share on WhatsApp</button></div>';
-  h+='<p class="sub">'+(seeAll?"All team reports":"Your reports")+'</p>';
-  if(!visible.length)h+='<div class="empty">No reports yet.</div>';
-  h+=visible.map(r=>'<div class="task p-'+(r.status==="completed"?"low":r.status==="pending"?"high":"med")+'"><h3>'+esc(r.task)+'</h3>'+
-    '<div class="meta"><span class="chip">👤 '+esc(r.assignedByName)+'</span><span class="chip">📅 '+esc(r.date)+'</span><span class="chip">'+esc(RST[r.status]||"")+'</span>'+
-    '<span class="chip">Follow-up: '+esc(r.staff)+'</span><span class="chip">By: '+esc(r.byRole)+'</span>'+(r.next?'<span class="chip">Next: '+esc(r.next)+'</span>':'')+'</div>'+
-    (r.update?'<p class="d">'+esc(r.update)+'</p>':'')+(r.remarks?'<div class="note">📝 '+esc(r.remarks)+'</div>':'')+
-    '<div class="acts"><button data-a="rshare" data-id="'+r.id+'">📤 Share</button>'+
-    (r.assignedBy===me.uid?'<button data-a="redit" data-id="'+r.id+'">✏️ Edit</button><button class="del" data-a="rdel" data-id="'+r.id+'">🗑</button>':'')+'</div></div>').join("");
+  h+='<div class="box"><div class="hd"><span>Daily work summary</span></div><label>Date</label><input id="r-sumdate" type="date" value="'+esc(sd)+'">'+
+    '<p class="pre">'+esc(dailySummary(sd,visible))+'</p>'+
+    '<button class="btn alt" data-a="dsum">Share on WhatsApp</button></div>';
+  h+='<p class="sec">'+(seeAll?"All team reports":"Your reports")+'</p>';
+  if(!visible.length)h+='<div class="empty">No reports yet. A report appears here when a task is marked Done or a follow-up report is saved.</div>';
+  h+=visible.map(r=>{const rt=reviewText(r);
+    return '<div class="task"><div class="th"><h3>'+esc(r.task)+'</h3><span class="tag s-'+esc(r.status)+'">'+esc(RST[r.status]||"")+'</span></div>'+
+    '<dl class="kv"><dt>Submitted by</dt><dd>'+esc(r.assignedByName)+'</dd><dt>Date</dt><dd>'+esc(r.date)+'</dd><dt>Follow-up staff</dt><dd>'+esc(r.staff)+'</dd><dt>Assigned by</dt><dd>'+esc(r.byRole)+'</dd>'+
+    (r.progress!=null&&r.progress!==""?'<dt>Progress</dt><dd>'+esc(r.progress)+'%</dd>':'')+(r.next?'<dt>Next follow-up</dt><dd>'+esc(r.next)+'</dd>':'')+(rt?'<dt>Review</dt><dd>'+rt+'</dd>':'')+'</dl>'+
+    (r.update?'<p class="d">'+esc(r.update)+'</p>':'')+(r.problem?'<div class="note bad"><b>Problem:</b> '+esc(r.problem)+'</div>':'')+(r.remarks?'<div class="note"><b>Remarks:</b> '+esc(r.remarks)+'</div>':'')+
+    '<div class="acts"><button data-a="rshare" data-id="'+r.id+'">Share</button>'+(boss&&r.status==="completed"?'<button class="ok" data-a="rv-ok" data-id="'+r.id+'">Approve</button><button data-a="rv-re" data-id="'+r.id+'">Request rework</button>':'')+
+    (r.assignedBy===me.uid?'<button data-a="redit" data-id="'+r.id+'">Edit</button><button class="del" data-a="rdel" data-id="'+r.id+'">Delete</button>':'')+'</div></div>';}).join("");
   $("list").innerHTML=h;
 }
 
+const getPos=()=>new Promise((res,rej)=>{
+  const G=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Geolocation;
+  if(G&&G.getCurrentPosition){G.getCurrentPosition({enableHighAccuracy:true,timeout:20000}).then(p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy})).catch(e=>rej(new Error((e&&e.message)||"Could not get your location. Turn on GPS and allow location for GS TEAM.")));return;}
+  if(!navigator.geolocation){rej(new Error("Location is not supported on this device."));return;}
+  navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),
+    e=>rej(new Error(e.code===1?"Location permission denied. Allow location for GS TEAM in phone settings.":"Could not get your location. Turn on GPS and try again.")),{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+});
+const dist=(a,b)=>{const R=6371000,t=x=>x*Math.PI/180,dLa=t(b.lat-a.lat),dLo=t(b.lng-a.lng),h=Math.sin(dLa/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h));};
+const getOffice=()=>{const o=offices.slice().sort((a,b)=>ms(b.at)-ms(a.at))[0];return o?{lat:o.lat,lng:o.lng,radius:o.radius||150}:null;};
+const fmtT=ts=>ts&&ts.toMillis?new Date(ts.toMillis()).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"-";
+const dur=(a,b)=>{if(!a||!b||!a.toMillis||!b.toMillis)return"-";const m=Math.max(0,Math.round((b.toMillis()-a.toMillis())/60000));return Math.floor(m/60)+"h "+(m%60)+"m";};
+async function doAtt(isIn,btn){
+  const td=today(), id="att_"+me.uid+"_"+td, mine=att.find(a=>a.id===id);
+  if(isIn&&mine){alert("You already checked in today.");return;}
+  if(!isIn&&(!mine||mine.outAt)){alert(mine?"You already checked out today.":"Check in first.");return;}
+  const old=btn.textContent; btn.disabled=true; btn.textContent="Getting location...";
+  try{
+    const pos=await getPos(), off=getOffice(); let d=null;
+    if(off){d=dist(pos,off);
+      if(d-Math.min(pos.acc||0,50)>off.radius){alert("You are about "+Math.round(d)+" m from the office. "+(isIn?"Check in":"Check out")+" works only at the office (within "+off.radius+" m).");return;}}
+    const dd=d==null?null:Math.round(d), ac=Math.round(pos.acc||0);
+    if(isIn)await setDoc(doc(db,"tasks",id),{type:"attendance",teamId,date:td,assignedBy:me.uid,assignedByName:me.name,inAt:serverTimestamp(),inDist:dd,inAcc:ac,inClient:Date.now()});
+    else await updateDoc(doc(db,"tasks",id),{outAt:serverTimestamp(),outDist:dd,outAcc:ac,outClient:Date.now()});
+  }catch(e){alert(e.message||errMsg(e));}
+  finally{btn.disabled=false;btn.textContent=old;}
+}
+function attendanceHtml(){
+  const td=today(), mine=att.find(a=>a.id==="att_"+me.uid+"_"+td), off=getOffice();
+  return '<div class="box"><div class="hd"><span>Attendance</span><span>'+td+'</span></div>'+
+    '<div class="figs att" style="grid-template-columns:repeat(3,1fr);margin-top:0;margin-bottom:14px">'+fig(fmtT(mine&&mine.inAt),"In time")+fig(fmtT(mine&&mine.outAt),"Out time")+fig(mine&&mine.outAt?dur(mine.inAt,mine.outAt):"-","Hours")+'</div>'+
+    (!mine?'<button class="btn" data-a="checkin">Check in</button>':!mine.outAt?'<button class="btn" data-a="checkout">Check out</button>':'<p class="sub" style="margin:0">Attendance for today is complete.</p>')+
+    (off?'':'<p class="sub" style="margin:10px 0 0">Office location is not set yet, so check-in works from anywhere.</p>')+'</div>';
+}
+function teamAttHtml(){
+  const d=attDate||today(), isT=d===today(), present=att.filter(x=>x.date===d).length;
+  return '<div class="box"><div class="hd"><span>Team attendance</span><span>'+present+' of '+team.members.length+' in</span></div><label>Date</label><input id="a-date" type="date" value="'+esc(d)+'">'+
+    team.members.map(m=>{const a=att.find(x=>x.assignedBy===m.uid&&x.date===d);
+      const st=a?'In '+fmtT(a.inAt)+(a.outAt?' · Out '+fmtT(a.outAt)+' · '+dur(a.inAt,a.outAt):' · still in'):(isT?'Not in yet':'Absent');
+      return '<div class="prow"><div class="pr1"><span>'+esc(m.name)+' <small>'+RL[roleOf(m.uid)]+'</small></span><span class="'+(a?'':'bad')+'">'+st+'</span></div></div>';}).join("")+'</div>';
+}
+function progressHtml(){
+  const seen={}, names=[];
+  [...team.members.map(m=>m.name),...tasks.map(x=>x.assignedToName)].forEach(n=>{const k=String(n||"").toLowerCase();if(k&&!seen[k]){seen[k]=1;names.push(n);}});
+  return '<div class="box"><div class="hd"><span>Team progress</span></div>'+names.map(n=>{
+    const k=String(n).toLowerCase(), m=team.members.find(x=>String(x.name).toLowerCase()===k),
+      t=tasks.filter(x=>String(x.assignedToName||"").toLowerCase()===k), d=t.filter(x=>x.status==="done").length,
+      late=t.filter(x=>x.due&&x.due<today()&&x.status!=="done").length, pct=t.length?Math.round(d*100/t.length):0;
+    return '<div class="prow"><div class="pr1"><span>'+esc(n)+(m?' <small>'+RL[roleOf(m.uid)]+'</small>':'')+'</span><span>'+d+' of '+t.length+' done'+(late?' <b class="bad">'+late+' late</b>':'')+'</span></div><div class="bar sm"><i style="width:'+pct+'%;background:var(--ok)"></i></div></div>';}).join("")+'</div>';
+}
+function renderDash(){
+  $("stat").innerHTML="";
+  const all=canSeeAll(), set=all?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid);
+  const n=set.length, c=k=>set.filter(t=>t.status===k).length, late=set.filter(t=>t.due&&t.due<today()&&t.status!=="done").length;
+  const pct=n?Math.round(c("done")*100/n):0, w=k=>(n?c(k)*100/n:0);
+  const nw=newTasks();
+  let h=attendanceHtml()+(nw.length?'<div class="note info"><b>'+nw.length+' new task'+(nw.length>1?'s':'')+'</b> waiting in My tasks.</div>':'')+
+    '<div class="box"><div class="hd"><span>'+(all?"Whole team":"Your tasks")+'</span><span>'+(n?pct+"% complete":"No tasks yet")+'</span></div>'+
+    '<div class="bar"><i style="width:'+w("done")+'%;background:var(--ok)"></i><i style="width:'+w("doing")+'%;background:var(--warn)"></i><i style="width:'+w("todo")+'%;background:#c4ccd6"></i></div>'+
+    '<div class="figs">'+fig(c("done"),"Done","var(--ok)")+fig(c("doing"),"In progress","var(--warn)")+fig(c("todo"),"To do")+fig(late,"Late",late?"var(--bad)":"")+'</div></div>';
+  if(roleOf(me.uid)==="boss"){
+    const pend=reports.filter(r=>r.status==="completed"&&reviewOf(r).state==="pending").length;
+    h+='<div class="box"><div class="hd"><span>Final review</span><span>'+pend+' waiting</span></div><p class="sub" style="margin:0">'+(pend?'Completed reports need your approval or a rework request.':'All completed reports are reviewed.')+'</p>'+(pend?'<button class="btn" style="margin-top:12px" data-a="gotorep">Review reports</button>':'')+'</div>';}
+  const todayN=reports.filter(r=>r.date===today()&&(all||r.assignedBy===me.uid)).length;
+  h+='<div class="box"><div class="hd"><span>Reports today</span><span>'+todayN+'</span></div></div>';
+  if(all&&team)h+=teamAttHtml();
+  if(all&&team)h+=progressHtml();
+  $("list").innerHTML=h;
+}
 function render(){
   $("fab").classList.toggle("hide",tab==="report"||roleOf(me.uid)==="exec");
   const nw=newTasks(), mt=document.querySelector('.tabs [data-t="mine"]');
-  if(mt)mt.textContent=nw.length?"My Tasks ("+nw.length+")":"My Tasks";
+  if(mt)mt.textContent=nw.length?"My tasks ("+nw.length+")":"My tasks";
+  if(tab==="dash"){renderDash();return;}
   if(tab==="report"){renderReport();return;}
   const mine=tasks.filter(t=>t.assignedTo===me.uid), given=tasks.filter(t=>t.assignedBy===me.uid);
   const set=tab==="mine"?mine:tab==="given"?given:(canSeeAll()?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid));
   const cnt=k=>set.filter(t=>t.status===k).length;
   let sum="";
-  if(tab==="mine"&&nw.length){sum='<div class="note" style="margin-bottom:12px">🔔 <b>'+nw.length+' new task'+(nw.length>1?'s':'')+'</b> from '+esc([...new Set(nw.map(t=>t.assignedByName))].join(", "))+'. <button data-a="seen" style="margin-left:8px;padding:6px 10px">Got it</button></div>';}
-  if(tab==="all"&&team&&canSeeAll()){sum='<div class="box"><b>👥 Team Progress</b>'+team.members.map(m=>{
-    const t=tasks.filter(x=>x.assignedTo===m.uid), d=t.filter(x=>x.status==="done").length,
-      late=t.filter(x=>x.due&&x.due<today()&&x.status!=="done").length;
-    return '<div style="display:flex;justify-content:space-between;gap:8px;padding-top:8px;margin-top:8px;border-top:1px solid var(--line)"><span>'+esc(m.name)+' <small style="color:var(--mut)">'+RL[roleOf(m.uid)]+'</small></span><span>'+d+'/'+t.length+' done'+(late?' · <b style="color:var(--bad)">'+late+' late</b>':'')+'</span></div>';}).join("")+'</div>';}
-  if((tab==="all"||tab==="given")&&set.length)sum+='<button class="btn alt" data-a="summary" style="margin-bottom:12px">📤 Share Summary on WhatsApp</button>';
+  if(tab==="mine"&&nw.length){sum='<div class="note info"><b>'+nw.length+' new task'+(nw.length>1?'s':'')+'</b> from '+esc([...new Set(nw.map(t=>t.assignedByName))].join(", "))+'.<button data-a="seen" class="mini">Mark as read</button></div>';}
+  if(tab==="all"&&team&&canSeeAll())sum=progressHtml();
+  if((tab==="all"||tab==="given")&&set.length)sum+='<button class="btn alt" data-a="summary" style="margin-bottom:12px">Share summary on WhatsApp</button>';
   $("stat").innerHTML=["todo","doing","done"].map(k=>`<div><b>${cnt(k)}</b>${SL[k]}</div>`).join("");
-  if(!set.length){$("list").innerHTML=sum+`<div class="empty">${tab==="mine"?"No tasks assigned to you yet 🎉":tab==="given"?"You have not assigned any tasks yet.":"No tasks in the team yet."}</div>`;return;}
+  if(!set.length){$("list").innerHTML=sum+`<div class="empty">${tab==="mine"?"No tasks are assigned to you yet.":tab==="given"?"You have not assigned any tasks yet. Tap New task to start.":"No tasks in the team yet."}</div>`;return;}
   $("list").innerHTML=sum+set.map(t=>{
     const late=t.due&&t.due<today()&&t.status!=="done";
     const canMove=t.assignedTo===me.uid||t.assignedBy===me.uid;
-    return `<div class="task p-${esc(t.priority)} ${t.status==="done"?"done":""}">
-      <h3>${esc(t.title)}</h3>
+    return `<div class="task ${t.status==="done"?"done":""}">
+      <div class="th"><h3>${esc(t.title)}</h3><span class="tag p-${esc(t.priority)}">${PRL[t.priority]||"Normal"}</span></div>
       ${t.desc?`<p class="d">${esc(t.desc)}</p>`:""}
-      <div class="meta">
-        <span class="chip">👤 ${esc(t.assignedToName)}</span>
-        ${t.assignedToPhone?`<a class="chip" href="tel:+${esc(t.assignedToPhone)}" style="text-decoration:none">📞 +${esc(t.assignedToPhone)}</a>`:""}
-        <span class="chip">📤 ${esc(t.assignedByName)}</span>
-        ${t.due?`<span class="chip ${late?"late":""}">📅 ${esc(t.due)}${late?" (late)":""}</span>`:""}
-      </div>
-      ${t.note?`<div class="note">📝 ${esc(t.note)}</div>`:""}
+      <dl class="kv"><dt>Assigned to</dt><dd>${esc(t.assignedToName)}${t.assignedToPhone?`<a href="tel:+${esc(t.assignedToPhone)}">+${esc(t.assignedToPhone)}</a>`:""}</dd><dt>Assigned by</dt><dd>${esc(t.assignedByName)}</dd>${t.due?`<dt>Due</dt><dd class="${late?"bad":""}">${esc(t.due)}${late?" (late)":""}</dd>`:""}</dl>
+      ${t.note?`<div class="note"><b>Note:</b> ${esc(t.note)}</div>`:""}
+      ${canMove?`<div class="seg">${["todo","doing","done"].map(k=>`<button class="${t.status===k?"cur":""}" data-a="st" data-id="${t.id}" data-v="${k}">${SL[k]}</button>`).join("")}</div>`:""}
       <div class="acts">
-        ${canMove?["todo","doing","done"].map(k=>`<button class="${t.status===k?"cur":""}" data-a="st" data-id="${t.id}" data-v="${k}">${SL[k]}</button>`).join(""):""}
-        ${canMove?`<button data-a="note" data-id="${t.id}">📝 Note</button>`:""}
-        ${t.assignedBy===me.uid&&t.assignedToPhone?`<button data-a="wa" data-id="${t.id}">💬 WhatsApp</button>`:""}
-        ${t.assignedBy===me.uid?`<button class="del" data-a="del" data-id="${t.id}">🗑</button>`:""}
+        ${canMove?`<button data-a="note" data-id="${t.id}">Add note</button>`:""}
+        ${t.assignedBy===me.uid&&t.assignedToPhone?`<button data-a="wa" data-id="${t.id}">Remind on WhatsApp</button>`:""}
+        ${t.assignedBy===me.uid?`<button class="del" data-a="del" data-id="${t.id}">Delete</button>`:""}
       </div></div>`;}).join("");
 }
 $("list").onclick=async e=>{
   const b=e.target.closest("button");if(!b)return;
   try{
+    if(b.dataset.a==="checkin"||b.dataset.a==="checkout"){await doAtt(b.dataset.a==="checkin",b);return;}
     if(b.dataset.a==="summary"){const arr=tab==="given"?tasks.filter(t=>t.assignedBy===me.uid):(canSeeAll()?tasks:tasks.filter(t=>t.assignedTo===me.uid||t.assignedBy===me.uid));
       window.open("https://wa.me/?text="+encodeURIComponent(summaryText(arr)),"_blank");return;}
+    if(b.dataset.a==="gotorep"){tab="report";document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x.dataset.t==="report"));render();window.scrollTo(0,0);return;}
+    if(b.dataset.a==="rv-ok"||b.dataset.a==="rv-re"){
+      const rp=reports.find(x=>x.id===b.dataset.id), state=b.dataset.a==="rv-ok"?"approved":"rework";
+      await setDoc(doc(db,"tasks","rev_"+rp.id+"_"+me.uid),{type:"review",teamId,reportId:rp.id,state,byName:me.name,assignedBy:me.uid,at:serverTimestamp()});
+      if(state==="rework"&&rp.auto){try{await updateDoc(doc(db,"tasks",rp.id.replace(/^auto_/,"")),{status:"doing",note:"Rework requested by "+me.name});}catch(e){}}
+      return;}
     if(b.dataset.a==="dsum"){const vis=canSeeAll()?reports:reports.filter(r=>r.assignedBy===me.uid);
       window.open("https://wa.me/?text="+encodeURIComponent(dailySummary(sumDate||today(),vis)),"_blank");return;}
     if(b.dataset.a==="seen"){try{localStorage.setItem(seenKey(),String(Date.now()));}catch(e){}render();return;}
@@ -435,11 +576,11 @@ $("list").onclick=async e=>{
     if(b.dataset.a==="redit"){editRid=b.dataset.id;skipKeep=true;renderReport();window.scrollTo(0,0);return;}
     if(b.id==="r-save"){
       const data={task:$("r-task").value.trim(),byRole:$("r-by").value,staff:$("r-staff").value.trim(),status:$("r-status").value,
-        update:$("r-update").value.trim(),remarks:$("r-remarks").value.trim(),next:$("r-next").value};
+        update:$("r-update").value.trim(),remarks:$("r-remarks").value.trim(),next:$("r-next").value,progress:Math.min(100,Math.max(0,Number($("r-prog").value)||0)),problem:$("r-prob").value.trim()};
       if(!data.task||!data.staff){alert("Enter the task and the follow-up staff name.");return;}
       if(editRid)await updateDoc(doc(db,"tasks",editRid),data);
       else await addDoc(collection(db,"tasks"),{...data,type:"report",teamId,date:today(),assignedBy:me.uid,assignedByName:me.name,createdAt:serverTimestamp()});
-      editRid=null;skipKeep=true;renderReport();alert("Report saved ✅");return;
+      editRid=null;skipKeep=true;renderReport();alert("Report saved.");return;
     }
     if(b.dataset.a==="rshare"){
       const r=reports.find(x=>x.id===b.dataset.id), t=reportText(r);
@@ -460,7 +601,7 @@ $("list").onclick=async e=>{
         if(b.dataset.v==="done"){
           const rr=roleOf(t.assignedBy);
           await setDoc(doc(db,"tasks",rid),{type:"report",auto:true,teamId,date:today(),task:t.title,byRole:rr==="boss"?"CEO":rr==="manager"?"Manager":"Executive",
-            staff:t.assignedToName,status:"completed",update:"Task completed",remarks:"",next:"",assignedBy:me.uid,assignedByName:me.name,createdAt:serverTimestamp()});
+            staff:t.assignedToName,status:"completed",update:"Task completed",remarks:"",next:"",progress:100,problem:"",assignedBy:me.uid,assignedByName:me.name,createdAt:serverTimestamp()});
         }else await deleteDoc(doc(db,"tasks",rid));
       }catch(e){}
     }
@@ -469,7 +610,8 @@ $("list").onclick=async e=>{
   }catch(err){alert(errMsg(err));}
 };
 
-$("list").onchange=e=>{if(e.target.id==="r-sumdate"){sumDate=e.target.value||null;renderReport();}};
+$("list").onchange=e=>{if(e.target.id==="r-sumdate"){sumDate=e.target.value||null;renderReport();}
+  if(e.target.id==="a-date"){attDate=e.target.value||null;renderDash();}};
 $("fab").onclick=()=>{$("n-title").value="";$("n-desc").value="";$("n-to").value="";$("n-phone").value="";$("n-due").value="";$("n-err").textContent="";$("modal").classList.remove("hide");};
 $("n-cancel").onclick=()=>$("modal").classList.add("hide");
 $("n-save").onclick=async()=>{
